@@ -4,7 +4,10 @@ import {  HttpClient } from '@angular/common/http';
 
 import  Commune from '../models/Commune';
 import  Departement from '../models/Departement';
+import { environment } from 'src/environments/environment';
 
+const URL_BACKEND=environment.backendUrl;
+const URL_GEOJSON=environment.backGeojsonUrl;
 
 const tiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   maxZoom: 19,
@@ -18,7 +21,7 @@ const tiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', 
 })
 export class MapComponent implements AfterViewInit  {
   private map;
-
+  polluant : string = "PM10";
   constructor(private http: HttpClient) { }
 
   ngAfterViewInit(): void {
@@ -33,9 +36,9 @@ export class MapComponent implements AfterViewInit  {
     });
     tiles.addTo(this.map);
 
-    this.http.get('https://raw.githubusercontent.com/gregoiredavid/france-geojson/master/departements-version-simplifiee.geojson').subscribe((json: any) => {
+    this.http.get(`${URL_GEOJSON}/departements-version-simplifiee.geojson`).subscribe((json: any) => {
     
-      this.http.get('http://localhost:8080/departements').subscribe((departements: Departement[]) => {
+      this.http.get(`${URL_BACKEND}/departements/${this.polluant}`).subscribe((departements: Departement[]) => {
     let i : number = 0;
     // couleur du périmètre et de l'intérieur des communes
     L.geoJSON(json, {
@@ -46,7 +49,7 @@ export class MapComponent implements AfterViewInit  {
           weight: 5,
           opacity: 0.1,
           dashArray: '3',
-          fillOpacity: 0.8};
+          fillOpacity: 0.5};
       },
       
 
@@ -78,10 +81,7 @@ export class MapComponent implements AfterViewInit  {
     let layer = e.target;
     layer.openPopup();
     layer.setStyle({
-      weight: 1,
-      
-      dashArray: '',
-      fillOpacity: 0.9
+      fillOpacity: 1
     });
     if (!L.Browser.ie && !L.Browser.edge) {
       layer.bringToFront();
@@ -89,8 +89,10 @@ export class MapComponent implements AfterViewInit  {
   }
   //fonction activée à la sortie de la sourie d'une commune
   function resetHighlight(e) {
-    
-     
+    e.target.closePopup();
+    e.target.setStyle({
+      fillOpacity: 0.5
+    });
     }
 
 
@@ -106,12 +108,12 @@ export class MapComponent implements AfterViewInit  {
         if(layer.feature.properties.code == codeDepartement){
           map.removeLayer(layer)
           let i : number = 0;
-          let nomDepartement = layer.feature.properties.nom.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
-          http.get('https://raw.githubusercontent.com/gregoiredavid/france-geojson/master/departements/'
-          + codeDepartement + '-'+ nomDepartement + '/communes-'+ codeDepartement 
-          + '-'+ nomDepartement + '.geojson').subscribe((communesGeojson: any) => {
+          let nomDepartement = layer.feature.properties.nom.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace("\'", "-").toLowerCase();
+          
+          http.get(`${URL_GEOJSON}/departements/${codeDepartement}-${nomDepartement}/communes-${codeDepartement}-${nomDepartement}.geojson`
+           ).subscribe((communesGeojson: any) => {
             
-            http.get('http://localhost:8080/communes/' + codeDepartement).subscribe((communes: Commune[]) => {
+            http.get(`${URL_BACKEND}/communes/${this.polluant}/${codeDepartement}`).subscribe((communes: Commune[]) => {
               
               communesGeojson.features = communesGeojson.features.sort((a,b) => a.properties.code - b.properties.code)
               if(communesGeojson.features.length != communes.length){
@@ -142,7 +144,7 @@ export class MapComponent implements AfterViewInit  {
                 weight: 1,
                 opacity: 0.1,
                 dashArray: '3',
-                fillOpacity: 0.8};
+                fillOpacity: 0.5};
             } ,
             onEachFeature: function onEachFeature(feature, layer) {
               layer.on({
