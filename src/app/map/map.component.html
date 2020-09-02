@@ -1,12 +1,17 @@
+<div class="test">
+  <div class="echelle-container">
+
+    <div *ngFor="let seuil of listeDesSeuilsDePollution; let i = index" class = "elementEchelle">
+      <div  [ngStyle]="{'background-color': seuil.codeCouleur}">{{seuil.seuilPollution}}</div>
+    </div>
+    
+  </div>
 <div class="checkbox-container">
 
 <mat-card>
   <mat-card-content>
-    <h2 class="example-h2">Checkbox configuration</h2>
-
-    <section class="example-section">
-      <label class="example-margin">Align:</label>
-      <mat-radio-group [(ngModel)]="polluant">
+    <section>
+      <mat-radio-group [(ngModel)]="polluant" >
         <mat-radio-button class="example-margin" value="PM10" (click)="modifMap('PM10')">PM10</mat-radio-button>
         <mat-radio-button class="example-margin" value="PM25" (click)="modifMap('PM25')">PM25</mat-radio-button>
         <mat-radio-button class="example-margin" value="O3" (click)="modifMap('O3')">O3</mat-radio-button>
@@ -15,11 +20,14 @@
         <mat-radio-button class="example-margin" value="CO" (click)="modifMap('CO')">CO</mat-radio-button>
       </mat-radio-group>
     </section>
+    
 
     
   </mat-card-content>
 </mat-card>
 </div>
+</div>
+
 <div class="map-container">
     <div class="map-frame">
       <div id="map"></div>

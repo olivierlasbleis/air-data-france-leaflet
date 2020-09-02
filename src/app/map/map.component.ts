@@ -1,7 +1,7 @@
-import { Component, AfterViewInit  } from '@angular/core';
+import { Component, AfterViewInit, OnInit  } from '@angular/core';
 import * as L from 'leaflet';
 import {  HttpClient } from '@angular/common/http';
-
+import  SeuilPollution from '../models/SeuilPollution';
 import  Commune from '../models/Commune';
 import  Departement from '../models/Departement';
 import { environment } from 'src/environments/environment';
@@ -22,11 +22,20 @@ const tiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', 
 export class MapComponent implements AfterViewInit  {
   private map;
   polluant : string = 'PM10';
+  index : number = 0;
+  listeDesSeuilsDePollution : SeuilPollution[] = [];
+
 
   constructor(private http: HttpClient) { }
 
+  ngOnInit():void{
+    this.http.get(`${URL_BACKEND}/data/${this.polluant}`).subscribe((seuilPollutions: SeuilPollution[]) => {
+    console.log(seuilPollutions)
+      this.listeDesSeuilsDePollution = seuilPollutions;
+    });
+  }
+
   ngAfterViewInit(): void {
-    
     this.initMap(this.polluant);
   }
 
@@ -34,12 +43,15 @@ export class MapComponent implements AfterViewInit  {
     console.log(polluant)
     this.removeAllLayer();
     this.insertionDonnees(polluant);
+    this.http.get(`${URL_BACKEND}/data/${polluant}`).subscribe((seuilPollutions: SeuilPollution[]) => {
+      console.log(seuilPollutions)
+        this.listeDesSeuilsDePollution = seuilPollutions;
+      });
   }
 
   private demarrageMap(): void {
-    
     this.map = L.map('map', {
-      center: [ 42, 0 ],
+      center: [ 46, 3 ],
       zoom: 5
     });
     tiles.addTo(this.map);
@@ -181,7 +193,7 @@ export class MapComponent implements AfterViewInit  {
                 click: zoomToFeature
               }).bindPopup(
                 "" +  feature.properties.code + " - " +feature.properties.nom + "<br>" +
-              "" + communes[y].donneePollution.valeur + " " + communes[y].donneePollution.uniteDeMesure +
+               communes[y].donneePollution.valeur + " " + communes[y].donneePollution.uniteDeMesure + "<br>" +
               "date de la mesure" + communes[y++].donneePollution.dateDeMesure
               , {closeButton: false});
              
