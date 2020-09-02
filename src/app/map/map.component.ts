@@ -189,8 +189,7 @@ export class MapComponent implements AfterViewInit  {
             onEachFeature: function onEachFeature(feature, layer) {
               layer.on({
                 mouseover: highlightFeature,
-                mouseout: resetHighlight,
-                click: zoomToFeature
+                mouseout: resetHighlight
               }).bindPopup(
                 "" +  feature.properties.code + " - " +feature.properties.nom + "<br>" +
                communes[y].donneePollution.valeur + " " + communes[y].donneePollution.uniteDeMesure + "<br>" +
