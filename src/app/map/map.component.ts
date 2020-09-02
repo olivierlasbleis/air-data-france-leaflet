@@ -30,7 +30,6 @@ export class MapComponent implements AfterViewInit  {
 
   ngOnInit():void{
     this.http.get(`${URL_BACKEND}/data/${this.polluant}`).subscribe((seuilPollutions: SeuilPollution[]) => {
-    console.log(seuilPollutions)
       this.listeDesSeuilsDePollution = seuilPollutions;
     });
   }
@@ -40,11 +39,9 @@ export class MapComponent implements AfterViewInit  {
   }
 
   modifMap(polluant : string){
-    console.log(polluant)
     this.removeAllLayer();
     this.insertionDonnees(polluant);
     this.http.get(`${URL_BACKEND}/data/${polluant}`).subscribe((seuilPollutions: SeuilPollution[]) => {
-      console.log(seuilPollutions)
         this.listeDesSeuilsDePollution = seuilPollutions;
       });
   }
@@ -66,7 +63,6 @@ export class MapComponent implements AfterViewInit  {
     let map = this.map;
     map.eachLayer(function (layer) {
       if (layer.feature) {
-        console.log(layer)
         map.removeLayer(layer);
       }
       
@@ -103,7 +99,7 @@ export class MapComponent implements AfterViewInit  {
           mouseout: resetHighlight,
           click: zoomToFeature
         }).bindPopup(
-        feature.properties.nom + "<br>" +
+          "<div style=\"font-weight: bold ; text-align : center\">"+  feature.properties.nom +"</div>"+  "<br>" +
         departements[i].donneePollution.valeur + " " + departements[i++].donneePollution.uniteDeMesure  
         
           
@@ -112,7 +108,6 @@ export class MapComponent implements AfterViewInit  {
         
       }
     }).addTo(this.map);
-    console.log(departements)
   });});
   
 
@@ -168,14 +163,11 @@ export class MapComponent implements AfterViewInit  {
                     }
                   }
                 }
-                console.log(indexSuppression)
                 for (const index of indexSuppression) {
                   communesGeojson.features.splice(index,1)
                 }
                 
               }
-              console.log(communesGeojson)
-        console.log(communes)
         let y = 0;
             L.geoJSON(communesGeojson, {
             style: function (feature) {
@@ -191,7 +183,7 @@ export class MapComponent implements AfterViewInit  {
                 mouseover: highlightFeature,
                 mouseout: resetHighlight
               }).bindPopup(
-               "<div styles=\"font-weight: bold\">"+  feature.properties.nom +"</div>"+ "<br>" +
+               "<div style=\"font-weight: bold ; text-align : center\">"+  feature.properties.nom +"</div>"+ "<br>" +
                communes[y].donneePollution.valeur + " " + communes[y].donneePollution.uniteDeMesure + "<br>" +
               "date de la mesure : " + communes[y++].donneePollution.dateDeMesure
               , {closeButton: false});
@@ -278,7 +270,6 @@ export class MapComponent implements AfterViewInit  {
     }
 
     function zoomToFeature(e) {
-      console.log(e.target.feature.properties)
     }
   }
 
