@@ -191,9 +191,9 @@ export class MapComponent implements AfterViewInit  {
                 mouseover: highlightFeature,
                 mouseout: resetHighlight
               }).bindPopup(
-                "" +  feature.properties.code + " - " +feature.properties.nom + "<br>" +
+               "<div styles=\"font-weight: bold\">"+  feature.properties.nom +"</div>"+ "<br>" +
                communes[y].donneePollution.valeur + " " + communes[y].donneePollution.uniteDeMesure + "<br>" +
-              "date de la mesure" + communes[y++].donneePollution.dateDeMesure
+              "date de la mesure : " + communes[y++].donneePollution.dateDeMesure
               , {closeButton: false});
              
               
