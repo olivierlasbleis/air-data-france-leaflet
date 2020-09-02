@@ -1,3 +1,25 @@
+<div class="checkbox-container">
+
+<mat-card>
+  <mat-card-content>
+    <h2 class="example-h2">Checkbox configuration</h2>
+
+    <section class="example-section">
+      <label class="example-margin">Align:</label>
+      <mat-radio-group [(ngModel)]="polluant">
+        <mat-radio-button class="example-margin" value="PM10" (click)="modifMap('PM10')">PM10</mat-radio-button>
+        <mat-radio-button class="example-margin" value="PM25" (click)="modifMap('PM25')">PM25</mat-radio-button>
+        <mat-radio-button class="example-margin" value="O3" (click)="modifMap('O3')">O3</mat-radio-button>
+        <mat-radio-button class="example-margin" value="NO2" (click)="modifMap('NO2')">NO2</mat-radio-button>
+        <mat-radio-button class="example-margin" value="SO2" (click)="modifMap('SO2')">SO2</mat-radio-button>
+        <mat-radio-button class="example-margin" value="CO" (click)="modifMap('CO')">CO</mat-radio-button>
+      </mat-radio-group>
+    </section>
+
+    
+  </mat-card-content>
+</mat-card>
+</div>
 <div class="map-container">
     <div class="map-frame">
       <div id="map"></div>

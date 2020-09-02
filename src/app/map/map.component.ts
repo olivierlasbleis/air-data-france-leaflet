@@ -21,21 +21,48 @@ const tiles = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', 
 })
 export class MapComponent implements AfterViewInit  {
   private map;
-  polluant : string = "PM10";
+  polluant : string = 'PM10';
+
   constructor(private http: HttpClient) { }
 
   ngAfterViewInit(): void {
-    this.initMap("PM10","");
+    
+    this.initMap(this.polluant);
   }
 
-  private initMap(polluant:string,departement:string): void {
+  modifMap(polluant : string){
+    console.log(polluant)
+    this.removeAllLayer();
+    this.insertionDonnees(polluant);
+  }
+
+  private demarrageMap(): void {
+    
     this.map = L.map('map', {
       center: [ 42, 0 ],
       zoom: 5
-      
     });
     tiles.addTo(this.map);
+  }
 
+  private initMap(polluant:string): void {
+    this.demarrageMap();
+    this.insertionDonnees(polluant);
+  }
+
+  private removeAllLayer(){
+    let map = this.map;
+    map.eachLayer(function (layer) {
+      if (layer.feature) {
+        console.log(layer)
+        map.removeLayer(layer);
+      }
+      
+      
+  });
+  }
+    private insertionDonnees(polluant : string){
+      
     this.http.get(`${URL_GEOJSON}/departements-version-simplifiee.geojson`).subscribe((json: any) => {
     
       this.http.get(`${URL_BACKEND}/departements/${this.polluant}`).subscribe((departements: Departement[]) => {
@@ -45,9 +72,9 @@ export class MapComponent implements AfterViewInit  {
 
       style: function (feature) {
         return {
-          fillColor: departements[i].indicateurPollutionPM10,
+          fillColor: departements[i].indicateurPollution,
           weight: 5,
-          opacity: 0.1,
+          opacity: 0.2,
           dashArray: '3',
           fillOpacity: 0.5};
       },
@@ -65,7 +92,7 @@ export class MapComponent implements AfterViewInit  {
           click: zoomToFeature
         }).bindPopup(
         feature.properties.nom + "<br>" +
-        departements[i].donneePollutionPM10.valeur + " " + departements[i++].donneePollutionPM10.uniteDeMesure  
+        departements[i].donneePollution.valeur + " " + departements[i++].donneePollution.uniteDeMesure  
         
           
         , {closeButton: false});
@@ -102,6 +129,7 @@ export class MapComponent implements AfterViewInit  {
       
       let codeDepartement : string = e.target.feature.properties.code;
       
+      
       map.eachLayer(function (layer) {
         if (layer.feature) {
           if (layer.feature.properties.code) {
@@ -113,7 +141,7 @@ export class MapComponent implements AfterViewInit  {
           http.get(`${URL_GEOJSON}/departements/${codeDepartement}-${nomDepartement}/communes-${codeDepartement}-${nomDepartement}.geojson`
            ).subscribe((communesGeojson: any) => {
             
-            http.get(`${URL_BACKEND}/communes/${this.polluant}/${codeDepartement}`).subscribe((communes: Commune[]) => {
+            http.get(`${URL_BACKEND}/communes/${polluant}/${codeDepartement}`).subscribe((communes: Commune[]) => {
               
               communesGeojson.features = communesGeojson.features.sort((a,b) => a.properties.code - b.properties.code)
               if(communesGeojson.features.length != communes.length){
@@ -140,7 +168,7 @@ export class MapComponent implements AfterViewInit  {
             L.geoJSON(communesGeojson, {
             style: function (feature) {
               return {
-                fillColor:  communes[y].indicateurPollutionPM10,
+                fillColor:  communes[y].indicateurPollution,
                 weight: 1,
                 opacity: 0.1,
                 dashArray: '3',
@@ -153,8 +181,8 @@ export class MapComponent implements AfterViewInit  {
                 click: zoomToFeature
               }).bindPopup(
                 "" +  feature.properties.code + " - " +feature.properties.nom + "<br>" +
-              "" + communes[y].donneePollutionPM10.valeur + " " + communes[y].donneePollutionPM10.uniteDeMesure +
-              "date de la mesure" + communes[y++].donneePollutionPM10.dateDeMesure
+              "" + communes[y].donneePollution.valeur + " " + communes[y].donneePollution.uniteDeMesure +
+              "date de la mesure" + communes[y++].donneePollution.dateDeMesure
               , {closeButton: false});
              
               
@@ -244,8 +272,6 @@ export class MapComponent implements AfterViewInit  {
   }
 
   
-  initMapAgain(polluant:string, departement : string){
-    this.initMap(polluant,departement)
-  }
+  
 
 }
